@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/templates/modelo.xhtml">
+
+    <ui:define name="conteudo">
+        <h:form id="formListagem">
+            <p:panel header="Lista de Formas de Pagamentos">
+                <p:dataTable id="tabela" 
+                             emptyMessage="Nenhum registro encontrado." 
+                             paginator="true"
+                             value="#{formaPagamentoBean.formaPagamentos}"
+                             var="formaPagamento"
+                             rows="7" paginatorPosition="top">
+
+                    <f:facet name="header">
+                        <p:commandButton icon="fa fa-plus" value="Novo" 
+                                         oncomplete="PF('dialogo').show();"
+                                         actionListener="#{formaPagamentoBean.novo}"
+                                         update="formCadastro:painel">
+                            <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+                        </p:commandButton>
+                    </f:facet>
+
+                    <p:column headerText="Entrada" style="width: 10%;"
+                              sortBy="#{formaPagamento.entrada}"
+                              filterBy="#{formaPagamento.entrada}">
+                        <h:outputText value="#{formaPagamento.entrada}"/>
+                    </p:column>
+
+                    <p:column headerText="Parcela" style="width: 10%;"
+                              sortBy="#{formaPagamento.parcela}"
+                              filterBy="#{formaPagamento.parcela}">
+                        <h:outputText value="#{formaPagamento.parcela}"/>
+                    </p:column>
+
+                    <p:column headerText="Tipo"
+                              sortBy="#{formaPagamento.tipo}"
+                              filterBy="#{formaPagamento.tipo}">
+                        <h:outputText value="#{formaPagamento.tipo}"/>
+                    </p:column>
+                    <p:column headerText="Opções" class="opcoes" style="width: 8%;">
+                        <p:commandButton icon="fa fa-trash"
+                                         actionListener="#{formaPagamentoBean.excluir}" 
+                                         update="mensagem :formListagem:tabela" >
+                            <p:confirm header="Confirmação" 
+                                       message="Deseja excluir a Forma de Pagamento?"
+                                       icon="fa fa-warning"/>
+                            <f:attribute name="formaPagamentoSelecionado" value="#{formaPagamento}"/>
+                        </p:commandButton>
+
+                        <p:commandButton icon="fa fa-edit" 
+                                         actionListener="#{formaPagamentoBean.editar}" 
+                                         update=":formCadastro:painel"
+                                         oncomplete="PF('dialogo').show();" >
+                            <f:attribute name="formaPagamentoSelecionado" value="#{formaPagamento}"/>
+                            <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+
+                <p:confirmDialog global="true" >
+                    <center>
+                        <p:commandButton value="Sim" 
+                                         type="button" 
+                                         styleClass="ui-confirmdialog-yes"
+                                         icon="fa fa-check"/>
+                        <p:commandButton value="Não" 
+                                         type="button" 
+                                         styleClass="ui-confirmdialog-no"
+                                         icon="fa fa-close"/>
+                    </center>
+                </p:confirmDialog>         
+            </p:panel>
+        </h:form>
+
+        <p:dialog header="Forma de pagamento - Cadastro" 
+                  widgetVar="dialogo" 
+                  resizable="false" 
+                  modal="true" 
+                  closable="false">
+            <h:form id="formCadastro">
+                <h:panelGrid id="painel" columns="2">
+                    <p:outputLabel for="entrada" value="Entrada:" />
+                    <p:inputText id="entrada" maxlength="4" size="10" 
+                                 required="true" 
+                                 requiredMessage="O campo 'Entrada' é obrigatório"
+                                 value="#{formaPagamentoBean.formaPagamento.entrada}"
+                                 converterMessage="O valor informado no campo 'Entrada' é  inválido"
+                                 validatorMessage="Informe um valor entre 0 e 5 no campo 'Entrada'">
+                        <f:validateLongRange minimum="0" maximum="5"/>
+                    </p:inputText>
+
+                    <p:outputLabel for="parcela" value="Parcelas:" />
+                    <p:inputText id="parcela" maxlength="4" size="10" 
+                                 required="true" 
+                                 requiredMessage="O campo 'Parcelas' é obrigatório"
+                                 value="#{formaPagamentoBean.formaPagamento.parcela}" 
+                                 converterMessage="O valor informado no campo 'Parcelas' é  inválido"
+                                 validatorMessage="Informe um valor entre 1 e 6 no campo 'Parcelas'">
+                        <f:validateLongRange minimum="1" maximum="6"/>
+                    </p:inputText>
+
+                    <p:outputLabel for="tipo" value="Tipo:" />
+                    <p:selectOneRadio  id="tipo" value="#{formaPagamentoBean.formaPagamento.tipo}"
+                                       required="true" 
+                                       requiredMessage="O campo 'Tipo' é obrigatório"
+                                       layout="pageDirection" >
+                        <f:selectItem itemValue="A Vista" itemLabel="A Vista"/>
+                        <f:selectItem itemValue="Nota Promissória" itemLabel="Nota Promissória"/>
+                        <f:selectItem itemValue="Cheque A Vista" itemLabel="Cheque A Vista"/>
+                        <f:selectItem itemValue="Cheque A Prazo" itemLabel="Cheque A Prazo"/>
+                        <f:selectItem itemValue="Cartão Débito" itemLabel="Cartão Débito"/>
+                        <f:selectItem itemValue="Cartão de Crédito" itemLabel="Cartão de Crédito"/>
+                    </p:selectOneRadio>   
+                </h:panelGrid>
+
+                <p:outputPanel style=" text-align:center">
+                    <p:commandButton icon="fa fa-floppy-o" value="Salvar" 
+                                     actionListener="#{formaPagamentoBean.salvar}"
+                                     update=":mensagem :formCadastro:painel :formListagem:tabela"/>
+                    <p:commandButton icon="fa fa-close" value="Fechar" oncomplete="PF('dialogo').hide();" />
+                </p:outputPanel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+</ui:composition>

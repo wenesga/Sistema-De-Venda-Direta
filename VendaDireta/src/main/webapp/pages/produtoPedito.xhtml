@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/templates/modelo.xhtml">
+
+    <ui:define name="conteudo">
+        <h:form id="formListagem">
+            <p:panel header="Lista de Produtos Pedido">
+                <p:dataTable id="tabela"
+                             emptyMessage="Nenhum registro encontrado." 
+                             paginator="true"
+                             value="#{produtoPedidoBean.produtoPedidos}"
+                             var="produtoPedido" 
+                             rows="7" paginatorPosition="top">
+
+                    <f:facet name="header">
+                        <p:commandButton icon="fa fa-plus" value="Novo"
+                                         actionListener="#{produtoPedidoBean.novo}"
+                                         oncomplete="PF('dialogo').show();" 
+                                         update=":mensagem :formCadastro:painel">
+                            <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+                        </p:commandButton>
+                    </f:facet>
+
+                    <p:column headerText="Pedido" filterMatchMode="contains"
+                              filterBy="#{produtoPedido.pedido.cliente.nome}"
+                              sortBy="#{produtoPedido.pedido.cliente.nome}">
+                        <h:outputText value="#{produtoPedido.pedido.cliente.nome} - Código: #{produtoPedido.pedido.cliente.codigo}"/>
+                    </p:column>
+
+                    <p:column headerText="Produto" filterMatchMode="contains"
+                              filterBy="#{produtoPedido.produto.nome}"
+                              sortBy="#{produtoPedido.produto.nome}">
+                        <h:outputText value="#{produtoPedido.produto.nome}"/>
+                        <h:outputText value=" - "/>
+                        <h:outputText value="#{produtoPedido.produto.valor_venda}">
+                            <f:convertNumber locale="pt_BR" minFractionDigits="2"/>
+                        </h:outputText>           
+                    </p:column>
+
+                    <p:column headerText="Quantidade" style="width: 8%;"
+                              filterBy="#{produtoPedido.quantidade_produto}"
+                              sortBy="#{produtoPedido.quantidade_produto}">
+                        <h:outputText value="#{produtoPedido.quantidade_produto}"/>
+                    </p:column>
+
+                    <p:column headerText="Opções" class="opcoes" style="width: 17%;">
+                        <p:commandButton icon="fa fa-trash" 
+                                         actionListener="#{produtoPedidoBean.excluir}" 
+                                         update=":mensagem :formListagem:tabela">
+                            <p:confirm rendered="Confirmação" message="Deseja excluir o Produto Pedido?" 
+                                       icon="fa fa-warning"/>
+                            <f:attribute name="produtoPedidoSelecionado" value="#{produtoPedido}"/>
+                        </p:commandButton>
+
+                        <p:commandButton icon="fa fa-edit" 
+                                         actionListener="#{produtoPedidoBean.editar}" 
+                                         update=":mensagem :formCadastro:painel" 
+                                         oncomplete="PF('dialogo').show();">
+                            <f:attribute name="produtoPedidoSelecionado" value="#{produtoPedido}"/>
+                            <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+                <p:confirmDialog global="true">
+                    <center>
+                        <p:commandButton value="Sim" type="butoon" styleClass="ui-confirmdialog-yes" 
+                                         icon="fa fa-check"/>
+                        <p:commandButton value="Não" type="butoon" styleClass="ui-confirmdialog-no" 
+                                         icon="fa fa-close"/>
+                    </center>
+                </p:confirmDialog>
+            </p:panel>
+        </h:form>
+
+        <p:dialog header="Produtos Pedido - Cadastro" 
+                  widgetVar="dialogo"
+                  resizable="false" 
+                  modal="true" 
+                  closable="false">
+            <h:form id="formCadastro">
+                <h:panelGrid id="painel" columns="2">
+
+
+                    <p:outputLabel for="pedido" value="Pedido:" />
+                    <p:selectOneMenu id="pedido" filter="true" style="width:350px"
+                                     value="#{produtoPedidoBean.produtoPedido.pedido}"
+                                     converter="omnifaces.SelectItemsConverter" 
+                                     required="true" filterMatchMode="contains"
+                                     requiredMessage="O campo 'Pedido' é obrigatório">
+                        <f:selectItem noSelectionOption="true" 
+                                      itemLabel="Selecione um pedido" />
+                        <f:selectItems value="#{produtoPedidoBean.pedidos}"
+                                       var="pedido"
+                                       itemValue="#{pedido}"
+                                       itemLabel="#{pedido.cliente.nome} - Codigo: #{pedido.cliente.codigo}"/>
+                    </p:selectOneMenu>
+
+
+
+                    <p:outputLabel for="produto" value="Produto:" />
+                    <p:selectOneMenu id="produto" filter="true" style="width:350px" 
+                                     value="#{produtoPedidoBean.produtoPedido.produto}"
+                                     converter="omnifaces.SelectItemsConverter" 
+                                     required="true" filterMatchMode="contains"
+                                     requiredMessage="O campo 'Produto' é obrigatório">
+                        <f:selectItem noSelectionOption="true" 
+                                      itemLabel="Selecione um produto" />
+                        <f:selectItems value="#{produtoPedidoBean.produtos}"
+                                       var="produto"
+                                       itemValue="#{produto}"
+                                       itemLabel="#{produto.nome} - #{produto.valor_venda}"/>
+                                       
+                    </p:selectOneMenu>
+                    
+                    <p:outputLabel for="quantidade" value="Quantidade:"/>
+                    <p:inputText id="quantidade" maxlength="3" size="10" 
+                                 value="#{produtoPedidoBean.produtoPedido.quantidade_produto}"
+                                 required="true"
+                                 requiredMessage="O campo 'Quantidade' é obrigatório"
+                                 converterMessage="O valor informado no campo 'Quantidade' é  inválido"
+                                 validatorMessage="Informe um valor entre 0 e 100 no campo 'Quantidade'">
+                        <f:validateLongRange minimum="1" maximum="100"/>
+                    </p:inputText>
+                </h:panelGrid>
+
+                <p:outputPanel style=" text-align:center">
+                    <p:commandButton icon="fa fa-floppy-o" value="Salvar" actionListener="#{produtoPedidoBean.salvar}"
+                                     update=":mensagem :formCadastro:painel :formListagem:tabela"/>
+                    <p:commandButton icon="fa fa-close" value="Fechar" oncomplete="PF('dialogo').hide();" />
+                </p:outputPanel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+</ui:composition>

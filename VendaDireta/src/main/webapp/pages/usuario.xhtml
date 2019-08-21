@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/templates/modelo.xhtml">
+
+    <ui:define name="conteudo">
+        <h:form id="formListagem">
+            <p:panel header="Lista de Usuários">
+                <p:dataTable id="tabela" 
+                             emptyMessage="Nenhum registro encontrado." 
+                             paginator="true" 
+                             value="#{usuarioBean.usuarios}" 
+                             var="usuario"
+                             rows="7" paginatorPosition="top">
+
+                    <f:facet name="header">
+                        <p:commandButton icon="fa fa-plus" value="Novo" 
+                                         oncomplete="PF('dialogo').show();" 
+                                         actionListener="#{usuarioBean.novo}" 
+                                         update=":formCadastro:painel">
+                            <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+                        </p:commandButton>
+                    </f:facet>
+
+                    <p:column headerText="Usuário" style="width: 50%;" filterMatchMode="contains"
+                              sortBy="#{usuario.nome}"
+                              filterBy="#{usuario.nome}">
+                        <h:outputText value="#{usuario.nome}"/>
+                    </p:column>
+
+                    <p:column headerText="CPF"  style="width: 50%;"
+                              sortBy="#{usuario.cpf}"
+                              filterBy="#{usuario.cpf}">
+                        <h:outputText value="#{usuario.cpf}"/>
+                    </p:column>                   
+
+                    <p:column headerText="Opções" class="opcoes" style="width: 8%;">
+                        <p:commandButton icon="fa fa-trash"
+                                         actionListener="#{usuarioBean.excluir}" 
+                                         update="mensagem :formListagem:tabela" >
+                            <p:confirm header="Confirmação" 
+                                       message="Deseja excluir o Usuário?"
+                                       icon="fa fa-warning"/>
+                            <f:attribute name="usuarioSelecionado" value="#{usuario}"/>
+                        </p:commandButton>
+
+                        <p:commandButton icon="fa fa-edit" 
+                                         actionListener="#{usuarioBean.editar}" 
+                                         update=":formCadastro:painel"
+                                         oncomplete="PF('dialogo').show();" >
+                            <f:attribute name="usuarioSelecionado" value="#{usuario}"/>
+                            <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+
+                <p:confirmDialog global="true" >
+                    <center>
+                        <p:commandButton value="Sim" 
+                                         type="button" 
+                                         styleClass="ui-confirmdialog-yes"
+                                         icon="fa fa-check"/>
+                        <p:commandButton value="Não" 
+                                         type="button" 
+                                         styleClass="ui-confirmdialog-no"
+                                         icon="fa fa-close"/>
+                    </center>
+                </p:confirmDialog>
+            </p:panel>
+        </h:form>
+
+        <p:dialog header="Usuário - Cadastro" 
+                  widgetVar="dialogo"
+                  resizable="false" 
+                  modal="true" 
+                  closable="false">
+
+            <h:form id="formCadastro">
+                <h:panelGrid id="painel" columns="2">
+                    <p:outputLabel for="usuario" value="Usuário:" />
+                    <p:inputText id="usuario" 
+                                 maxlength="50" size="20" 
+                                 value="#{usuarioBean.usuario.nome}" 
+                                 required="true" requiredMessage="O campo 'Usuário' é obrigatório"/>
+
+                    <p:outputLabel for="cpf" value="CPF:" />
+                    <p:inputMask mask="999.999.999-99" id="cpf" size="20" 
+                                 value="#{usuarioBean.usuario.cpf}" 
+                                 required="true" 
+                                 requiredMessage="O campo 'CPF' é obrigatório">
+                        <f:validateBean/>
+                    </p:inputMask>
+
+                    <p:outputLabel for="senha" value="Senha: "/>
+                    <p:password id="senha" 
+                                match="senha2" 
+                                value="#{usuarioBean.usuario.senha}" 
+                                size="20" maxlength="32" 
+                                required="true" requiredMessage="O campo 'Senha' é obrigatório"
+                                validatorMessage="Erro ao confirma Senha e deve ter no minimo 4 caracteres">
+                        <f:validateRegex pattern="((.*).{4,})" />
+                    </p:password>
+
+                    <p:outputLabel for="senha2" value="Confirmar Senha: "/>
+                    <p:password id="senha2" size="20" maxlength="50"
+                                required="true" requiredMessage="O campo 'Confirmar senha' é obrigatório"/>
+                </h:panelGrid>
+
+                <p:outputPanel style=" text-align:center">
+                    <p:commandButton icon="fa fa-floppy-o" value="Salvar" 
+                                     actionListener="#{usuarioBean.salvar}" 
+                                     update=":mensagem :formCadastro:painel :formListagem:tabela" />
+                    <p:commandButton icon="fa fa-close" value="Fechar" 
+                                     oncomplete="PF('dialogo').hide();" />
+                </p:outputPanel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+</ui:composition>
+

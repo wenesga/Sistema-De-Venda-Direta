@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/templates/modelo.xhtml">
+
+    <ui:define name="conteudo">
+        <h:form id="formListagem">
+            <p:panel header="Lista de Pedidos">
+                <p:dataTable id="tabela" 
+                             emptyMessage="Nenhum registro encontrado." 
+                             paginator="true"
+                             value="#{pedidoBean.pedidos}"
+                             var="pedido"
+                             rows="7" paginatorPosition="top">
+
+                    <f:facet name="header">
+                        <p:commandButton icon="fa fa-plus" value="Novo" 
+                                         actionListener="#{pedidoBean.novo}"
+                                         oncomplete="PF('dialogo').show();" 
+                                         update=":mensagem :formCadastro:painel">
+                            <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+                        </p:commandButton>
+                    </f:facet>
+
+                    <p:column headerText="Cliente" filterMatchMode="contains"
+                              filterBy="#{pedido.cliente.nome}"
+                              sortBy="#{pedido.cliente.nome}">
+                        <h:outputText value="#{pedido.cliente.nome}"/>
+                    </p:column>
+
+                    <p:column headerText="Forma de Pagamento"
+                              filterBy="#{pedido.formaPagamento.tipo}"
+                              sortBy="#{pedido.formaPagamento.tipo}">
+                        <h:outputText value="#{pedido.formaPagamento.tipo}"/>
+                    </p:column>
+
+                    <p:column headerText="Data do Pedito" style="width: 10%;" filterMatchMode="contains"
+                              filterBy="#{pedido.data_pedido}"
+                              sortBy="#{pedido.data_pedido}">
+                        <h:outputText value="#{pedido.data_pedido}">
+                            <f:convertDateTime locale="pt_BR" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Vencimento" style="width: 10%;" filterMatchMode="contains"
+                              filterBy="#{pedido.prazo_pagamento}"
+                              sortBy="#{pedido.prazo_pagamento}">
+                        <h:outputText value="#{pedido.prazo_pagamento}">
+                            <f:convertDateTime locale="pt_BR" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Opções" class="opcoes" style="width: 17%;">
+                        <p:commandButton icon="fa fa-trash" 
+                                         actionListener="#{pedidoBean.excluir}" 
+                                         update=":mensagem :formListagem:tabela">
+                            <p:confirm rendered="Confirmação" message="Deseja excluir o Pedido?" 
+                                       icon="fa fa-warning"/>
+                            <f:attribute name="pedidoSelecionado" value="#{pedido}"/>
+                        </p:commandButton>
+
+                        <p:commandButton icon="fa fa-edit" 
+                                         actionListener="#{pedidoBean.editar}" 
+                                         update=":mensagem :formCadastro:painel" 
+                                         oncomplete="PF('dialogo').show();">
+                            <f:attribute name="pedidoSelecionado" value="#{pedido}"/>
+                            <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+                <p:confirmDialog global="true">
+                    <center>
+                        <p:commandButton value="Sim" type="butoon" styleClass="ui-confirmdialog-yes" 
+                                         icon="fa fa-check"/>
+                        <p:commandButton value="Não" type="butoon" styleClass="ui-confirmdialog-no" 
+                                         icon="fa fa-close"/>
+                    </center>
+                </p:confirmDialog>
+            </p:panel>      
+        </h:form>
+
+        <p:dialog header="Pedidos - Cadastro" 
+                  widgetVar="dialogo"
+                  resizable="false" 
+                  modal="true" 
+                  closable="false">
+            <h:form id="formCadastro">
+                <h:panelGrid id="painel" columns="2">
+                    <p:outputLabel for="cliente" value="Cliente:" />
+                    <p:selectOneMenu id="cliente" filter="true" style="width:290px"
+                                     value="#{pedidoBean.pedido.cliente}"
+                                     converter="omnifaces.SelectItemsConverter" 
+                                     required="true" filterMatchMode="contains"
+                                     requiredMessage="O campo 'Cliente' é obrigatório">
+                        <f:selectItem noSelectionOption="true" 
+                                      itemLabel="Selecione um cliente" />
+                        <f:selectItems value="#{pedidoBean.clientes}"
+                                       var="cliente"
+                                       itemValue="#{cliente}"
+                                       itemLabel="#{cliente.nome} - #{cliente.codigo}"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel for="formaPagamento" value="Forma de pagamento:" />
+                    <p:selectOneMenu id="formaPagamento" filter="true" style="width:290px"
+                                     value="#{pedidoBean.pedido.formaPagamento}"
+                                     converter="omnifaces.SelectItemsConverter" 
+                                     required="true" 
+                                     requiredMessage="O campo 'Forma de Pagamento' é obrigatório">
+                        <f:selectItem noSelectionOption="true" 
+                                      itemLabel="Selecione uma forma de pagamento" />
+                        <f:selectItems value="#{pedidoBean.formaPagamentos}"
+                                       var="formaPagamento"
+                                       itemValue="#{formaPagamento}"
+                                       itemLabel="#{formaPagamento.tipo}"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel for="dataPedido" value="Data do Pedido:" />
+                    <p:calendar id="dataPedido" locale="pt_BR" 
+                                value="#{pedidoBean.pedido.data_pedido}"
+                                required="true" 
+                                requiredMessage="O campo 'Data do Pedido' é obrigatório"
+                                readonlyInput="true"
+                                mindate="0" maxdate="0" size="10"/>
+
+                    <p:outputLabel for="prazoPedido" value="Data de Vencimento:" />
+                    <p:calendar id="prazoPedido"  locale="pt_BR"
+                                value="#{pedidoBean.pedido.prazo_pagamento}"
+                                required="true" 
+                                requiredMessage="O campo 'Prazo de Pagamento' é obrigatório"
+                                readonlyInput="true"
+                                pages="2" mindate="0" maxdate="30" size="10"/>
+                </h:panelGrid>
+
+                <p:outputPanel style=" text-align:center">
+                    <p:commandButton icon="fa fa-floppy-o" value="Salvar" actionListener="#{pedidoBean.salvar}"
+                                     update=":mensagem :formCadastro:painel :formListagem:tabela"/>
+                    <p:commandButton icon="fa fa-close" value="Fechar" oncomplete="PF('dialogo').hide();" />
+                </p:outputPanel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+</ui:composition>
