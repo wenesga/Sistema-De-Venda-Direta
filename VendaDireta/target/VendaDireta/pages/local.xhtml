@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/templates/modelo.xhtml">
+    <ui:define name="conteudo">
+        <p:gmap id="gmap" center="-12.9272021,-46.9450947" zoom="15" type="HYBRID" style="width:100%;height:460px"
+                model="#{localBean.emptyModel}" onPointClick="handlePointClick(event);" widgetVar="map" />
+        <p:dialog widgetVar="dlg" 
+                  showEffect="fade"
+                  header="Adicionar Local"
+                  resizable="false"
+                  closable="false">
+            <h:form prependId="false">
+                <h:panelGrid columns="2">
+                    <h:outputLabel  for="title" value="Descrição:"/>
+                    <p:inputText id="title" value="#{localBean.title}" />
+                    <f:facet name="footer" >
+                        <p:outputPanel style=" text-align:center">
+                            <p:commandButton value="Adicionar" actionListener="#{localBean.addMarker}" update=":mensagem" oncomplete="markerAddComplete()" />
+                            <p:commandButton  value="Cancelar" onclick="return cancel()"/>
+                        </p:outputPanel>
+                    </f:facet>
+                </h:panelGrid>
+                <h:inputHidden id="lat" value="#{localBean.lat}"/>
+                <h:inputHidden id="lng" value="#{localBean.lng}"/>
+            </h:form>
+        </p:dialog>
+        <script type="text/javascript">
+            var currentMarker = null;
+        
+            function handlePointClick(event) {
+                if (currentMarker === null) {
+                    document.getElementById('lat').value = event.latLng.lat();
+                    document.getElementById('lng').value = event.latLng.lng();
+
+                    currentMarker = new google.maps.Marker({
+                        position: new google.maps.LatLng(event.latLng.lat(), event.latLng.lng())
+                    });
+
+                    PF('map').addOverlay(currentMarker);
+
+                    PF('dlg').show();
+                }
+            }
+
+            function markerAddComplete() {
+                var title = document.getElementById('title');
+                currentMarker.setTitle(title.value);
+                title.value = "";
+
+                currentMarker = null;
+                PF('dlg').hide();
+            }
+
+            function cancel() {
+                PF('dlg').hide();
+                currentMarker.setMap(null);
+                currentMarker = null;
+
+                return false;
+            }
+        </script>
+    </ui:define>
+</ui:composition>

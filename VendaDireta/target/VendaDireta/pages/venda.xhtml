@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/templates/modelo.xhtml">
+
+    <f:metadata>
+        <f:viewAction action="#{vendaBean.novo}" />
+    </f:metadata>
+
+    <ui:define name="conteudo">      
+
+        <h:form id="formulario">
+            <p:panel header="Produtos">    
+                <p:dataTable id="tabelaProduto"
+                             emptyMessage="Nenhum registro encontrado." 
+                             paginator="true"
+                             value="#{vendaBean.produtos}"
+                             var="produto" 
+                             rows="3" paginatorPosition="top">
+
+                    <p:column headerText="Nome" filterMatchMode="contains"
+                              filterBy="#{produto.nome}"
+                              sortBy="#{produto.nome}">
+                        <h:outputText value="#{produto.nome}"/>
+                    </p:column>            
+
+                    <p:column headerText="Fornecedor" filterMatchMode="contains" style="width: 30%;"
+                              filterBy="#{produto.fornecedor.nome}"
+                              sortBy="#{produto.fornecedor.nome}">
+                        <h:outputText value="#{produto.fornecedor.nome}"/>
+                    </p:column>
+
+                    <p:column headerText="Preço" style="width: 8%;"
+                              sortBy="#{produto.valor_venda}">
+                        <h:outputText value="#{produto.valor_venda}">
+                            <f:convertNumber locale="pt_BR" minFractionDigits="2"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Estoque" style="width: 8%;"
+                              sortBy="#{produto.estoque}">
+                        <h:outputText value="#{produto.estoque}"/>
+                    </p:column>
+
+                    <p:column headerText="Opções" class="opcoes" style="width: 8%;">
+                        <p:commandButton icon="fa fa-plus"
+                                         actionListener="#{vendaBean.adicionar}"
+                                         update=":formulario:tabelaCesta :formulario:painelFinalizacao">
+                            <f:attribute name="produtoSelecionado" value="#{produto}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+
+            <p:panel header="Cesta de Compras">   
+                <p:dataTable id="tabelaCesta"
+                             emptyMessage="Nenhum produto da cesta de compras." 
+                             paginator="true"
+                             value="#{vendaBean.itensVenda}"
+                             var="itemVenda" 
+                             rows="5" paginatorPosition="top">
+
+                    <p:column headerText="Nome">
+                        <h:outputText value="#{itemVenda.produto.nome}"/>
+                    </p:column>            
+
+                    <p:column headerText="Preço Unitário." style="width: 8%;">
+                        <h:outputText value="#{itemVenda.produto.valor_venda}">
+                            <f:convertNumber locale="pt_BR" minFractionDigits="2"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Quantidade" style="width: 8%;">
+                        <h:outputText value="#{itemVenda.quantidade}"/>
+                    </p:column>
+
+                    <p:column headerText="Preço Parcial" style="width: 8%;">
+                        <h:outputText value="#{itemVenda.valorParcial}">
+                            <f:convertNumber locale="pt_BR" minFractionDigits="2"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Opções" class="opcoes" style="width: 8%;">
+                        <p:commandButton icon="fa fa-minus"
+                                         actionListener="#{vendaBean.remover}"
+                                         update=":formulario:tabelaCesta :formulario:painelFinalizacao">
+                            <f:attribute name="itemSelecionado" value="#{itemVenda}" />                       
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+
+            <p:outputPanel id="painelFinalizacao" style=" text-align:center; font-weight: bold;">
+                <p:outputLabel  value="Total:" style=" font-size: 150% !important;"/>
+                <h:outputText value="#{vendaBean.venda.valorTotal}" style=" font-size: 150% !important;">
+                    <f:convertNumber locale="pt_BR" type="currency" currencySymbol="  R$" />
+                </h:outputText>
+                <br/>
+                
+                <p:commandButton icon="fa fa-check" value="Finalizar"
+                                 actionListener="#{vendaBean.finalizar}"
+                                 update=":mensagem :formularioFinalizar:painelFinalizar"
+                                 oncomplete="PF('dialogo').show();">
+                    <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener"/>
+                </p:commandButton>
+            </p:outputPanel>
+        </h:form>   
+
+
+        <p:dialog header="Finalizar Venda" 
+                  widgetVar="dialogo"
+                  resizable="false" 
+                  modal="true" 
+                  closable="false">
+            <h:form id="formularioFinalizar" class="x">
+                <h:panelGrid id="painelFinalizar" columns="2">
+
+                    <p:outputLabel value="Horário: "/>
+                    <h:outputText value="#{vendaBean.venda.horario}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm" locale="pt_BR" timeZone="America/Sao_Paulo"/>
+                    </h:outputText>
+
+                    <p:outputLabel  value="Total:"/>
+                    <h:outputText value="#{vendaBean.venda.valorTotal}">
+                        <f:convertNumber locale="pt_BR" type="currency" currencySymbol="R$" />
+                    </h:outputText>
+
+                    <h:outputLabel value="Usuário:"/>
+                    <h:outputText value="#{autenticacaoBean.usuarioLogado.nome}"/>
+
+                    <p:outputLabel value="Cliente:" />
+                    <p:selectOneMenu value="#{vendaBean.venda.cliente}" style="width:300px"
+                                     converter="omnifaces.SelectItemsConverter" 
+                                     filter="true" filterMatchMode="contains">
+                        <f:selectItem noSelectionOption="true"
+                                      itemLabel="Selecione um cliente" />
+                        <f:selectItems value="#{vendaBean.clientes}" 
+                                       var="cliente"
+                                       itemValue="#{cliente}" 
+                                       itemLabel="#{cliente.nome} - Cod.#{cliente.codigo}" />
+                    </p:selectOneMenu>
+
+                    <p:outputLabel  for="formaPagamento" value="Forma de Pagamento:"/>
+                    <p:selectOneMenu id="formaPagamento" value="#{vendaBean.venda.forma_pagamento}" style="width:300px"
+                                     converter="omnifaces.SelectItemsConverter" 
+                                     filter="true" 
+                                     required="true" requiredMessage="O campo 'Forma de Pagamento' é obrigatório">
+                        <f:selectItem noSelectionOption="true"
+                                      itemLabel="Selecione uma forma de pagamento" />
+                        <f:selectItems value="#{vendaBean.formaPagamentos}" 
+                                       var="formaPagamento"
+                                       itemValue="#{formaPagamento}" 
+                                       itemLabel="#{formaPagamento.tipo}" />
+                    </p:selectOneMenu>
+                </h:panelGrid>
+
+                <p:outputPanel style=" text-align:center">
+                    <p:commandButton icon="fa fa-floppy-o" value="Salvar" actionListener="#{vendaBean.salvar}"
+                                     update=":mensagem :formulario:tabelaProduto :formulario:tabelaCesta :formulario:painelFinalizacao"                                       
+                                     oncomplete="PF('dialogo').show();">                  
+                    </p:commandButton>
+                    <p:commandButton icon="fa fa-close" value="Fechar" oncomplete="PF('dialogo').hide();" />
+                </p:outputPanel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+</ui:composition>

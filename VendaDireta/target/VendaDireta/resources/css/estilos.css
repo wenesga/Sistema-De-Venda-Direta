@@ -1,0 +1,72 @@
+@CHARSET "UTF-8";
+
+.ui-widget, .ui-widget .ui-widget {
+    font-size: 100% !important;
+    font-family: sans-serif;
+    text-shadow: 0 1px white;
+
+}
+.ui-icon {  
+    font-size: 100% !important;
+}
+
+.ui-panel, .ui-panel-titlebar {
+    border-radius:0px;
+    color: #AED2D9;
+    font-size: 20px;
+}
+
+.ui-menubar{
+    border-radius:0px
+}
+
+.ui-datatable-header{
+    border-radius:0px
+} 
+
+.ui-widget-content {
+    border: 1px solid #aaaaaa;
+    background: repeat-y right 0 #f3f3f3;
+}
+
+.ui-dialog{
+    
+}
+
+.imagemCentralizada {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.divTopo {
+    background-color: #AED2D9;
+    border-radius:0px;
+    text-shadow: 0 1px white;
+}
+
+.divCabecalho {
+    padding-bottom: 4px;
+}
+
+.opcoes{
+    text-align: center;
+}
+
+.principal{
+    background-color: #AED2D9;
+    border-width: 0px;
+    height: 450px;
+    margin-top: -4px;    
+    border-radius:5px;
+    margin-left: auto;
+    margin-right: auto;
+    text-orientation: sideways;
+    position: relative; 
+}
+
+.principalTexto{
+    position: relative; 
+}
+
+

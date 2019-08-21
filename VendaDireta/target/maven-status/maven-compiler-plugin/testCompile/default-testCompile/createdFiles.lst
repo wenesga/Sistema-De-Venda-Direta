@@ -1,0 +1,13 @@
+br\com\vendadireta\dao\ClienteDAOTest.class
+br\com\vendadireta\dao\CidadeDAOTest.class
+br\com\vendadireta\dao\FornecedorDAOTest.class
+br\com\vendadireta\dao\FormaPagamentoDAOTest.class
+br\com\vendadireta\dao\MarcaDAOTest.class
+br\com\vendadireta\dao\PedidoDAOTest.class
+br\com\vendadireta\dao\CategoriaDAOTest.class
+br\com\vendadireta\dao\UsuarioDAOTest.class
+br\com\vendadireta\dao\EstadoDAOTest.class
+br\com\vendadireta\dao\ProdutoPeditoDAOTest.class
+br\com\vendadireta\dao\LocalDAOTest.class
+br\com\vendadireta\dao\ProdutoDAOTest.class
+br\com\vendadireta\util\HibernateUtilTest.class

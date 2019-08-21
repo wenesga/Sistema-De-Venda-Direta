@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<!--
+    Hibernate é um framework para realizar o mapeamento objeto relacional(ORM) 
+    escrito na linguagem java, onde seu principal objetivo é diminuir a complexidade 
+    envolvido no desenvolvimento de aplicações que necessitam trabalhar com banco de 
+    dados relacional, onde ele realiza a intermediação entre o banco de dados e sua 
+    aplicação, poupando o desenvolvedor de ter que se preocupar com instruções SQL 
+    para recuperar ou persistir os dados do seu software. 
+-->
+<hibernate-configuration>
+    <session-factory>
+        <!-- Configurações de Conexão com o Banco de Dados -->
+        <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="connection.url">jdbc:mysql://127.0.0.1:3306/venda_direta</property>
+        <property name="connection.username">root</property>
+        <property name="connection.password">1234</property>
+
+        <!-- Pool de Conexões -->
+        <property name="connection.pool_size">1</property>
+
+        <!-- SQL dialect -->
+        <property name="dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
+
+        <!-- Gerenciamento do Contexto das Sessões -->
+        <property name="current_session_context_class">thread</property>
+
+        <!-- Cache de Segundo Nível -->
+        <property name="cache.provider_class">org.hibernate.cache.internal.NoCacheProvider</property>
+
+        <!-- Mostra as SQLs Geradas -->
+        <property name="show_sql">true</property>
+
+        <!-- Cria as tabelas do banco de dados -->
+        <property name="hbm2ddl.auto">validate</property>
+		
+        <!-- Mapeamento das entidades -->
+        <mapping class="br.com.vendadireta.entidade.Usuario" />
+        <mapping class="br.com.vendadireta.entidade.Categoria" />
+        <mapping class="br.com.vendadireta.entidade.Marca" />
+        <mapping class="br.com.vendadireta.entidade.FormaPagamento" />
+        <mapping class="br.com.vendadireta.entidade.Cliente" />
+        <mapping class="br.com.vendadireta.entidade.Produto" />
+        <mapping class="br.com.vendadireta.entidade.Pedido" />
+        <mapping class="br.com.vendadireta.entidade.ProdutoPedido" />
+        <mapping class="br.com.vendadireta.entidade.Estado" />
+        <mapping class="br.com.vendadireta.entidade.Cidade" />
+        <mapping class="br.com.vendadireta.entidade.Fornecedor" />
+        <mapping class="br.com.vendadireta.entidade.ItemVenda" />
+        <mapping class="br.com.vendadireta.entidade.Venda" />
+        <mapping class="br.com.vendadireta.entidade.Local" />
+        
+    </session-factory>
+</hibernate-configuration>

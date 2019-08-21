@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/templates/modelo.xhtml">
+    <ui:define name="conteudo">
+
+        <h:form id="formListagem">
+            <p:panel header="Lista de Categorias" class="fontCor">
+                <p:dataTable id="tabela" 
+                             emptyMessage="Nenhum registro encontrado."
+                             paginator="true" 
+                             value="#{categoriaBean.categoiras}" 
+                             var="categoria"
+                             rows="7" paginatorPosition="top">
+
+                    <f:facet name="header">
+                        <p:commandButton icon="fa fa-plus" value="Novo" 
+                                         oncomplete="PF('dialogo').show();" 
+                                         actionListener="#{categoriaBean.novo}" 
+                                         update=":formCadastro:painel">
+                            <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+                        </p:commandButton>
+                    </f:facet>
+
+                    <p:column headerText="Nome" style="width: 50%;" filterMatchMode="contains"
+                              sortBy="#{categoria.nome}"
+                              filterBy="#{categoria.nome}">
+                        <h:outputText value="#{categoria.nome}"/>
+                    </p:column>
+
+                    <p:column headerText="Opções" style="width: 50%;" class="opcoes">
+                        <p:commandButton icon="fa fa-trash"
+                                         actionListener="#{categoriaBean.excluir}" 
+                                         update="mensagem :formListagem:tabela" >
+                            <p:confirm header="Confirmação" 
+                                       message="Deseja excluir a Categoria?"
+                                       icon="fa fa-warning"/>
+                            <f:attribute name="categoriaSelecionado" value="#{categoria}"/>
+                        </p:commandButton>
+
+                        <p:commandButton icon="fa fa-edit" 
+                                         actionListener="#{categoriaBean.editar}" 
+                                         update=":formCadastro:painel"
+                                         oncomplete="PF('dialogo').show();" >
+                            <f:attribute name="categoriaSelecionado" value="#{categoria}"/>
+                            <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+
+                <p:confirmDialog global="true" >
+                    <center>
+                        <p:commandButton value="Sim" 
+                                         type="button" 
+                                         styleClass="ui-confirmdialog-yes"
+                                         icon="fa fa-check"/>
+                        <p:commandButton value="Não" 
+                                         type="button" 
+                                         styleClass="ui-confirmdialog-no"
+                                         icon="fa fa-close"/>
+                    </center>
+                </p:confirmDialog>              
+            </p:panel>
+        </h:form>
+
+        <p:dialog header="Categoria - Cadastro" 
+                  widgetVar="dialogo" 
+                  resizable="false" 
+                  modal="true" 
+                  closable="false">
+
+            <h:form id="formCadastro">
+                <h:panelGrid id="painel" columns="2">
+                    <p:outputLabel for="categoria" value="Nome:" />
+                    <p:inputText id="categoria" 
+                                 maxlength="100" size="30" 
+                                 value="#{categoriaBean.categoria.nome}" 
+                                 required="true" requiredMessage="Preencha o campo 'Categoria'"/>
+                </h:panelGrid>
+
+                <p:outputPanel style=" text-align:center">
+                    <p:commandButton icon="fa fa-floppy-o" value="Salvar" 
+                                     actionListener="#{categoriaBean.salvar}" 
+                                     update=":mensagem :formCadastro:painel :formListagem:tabela" />
+                    <p:commandButton icon="fa fa-close" value="Fechar" oncomplete="PF('dialogo').hide();" />
+                </p:outputPanel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+</ui:composition>

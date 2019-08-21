@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <ui:insert name="metadata" />
+
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Venda Direta</title>
+        <h:outputStylesheet library="css" name="estilos.css"/>
+        <h:outputScript library="js" name="scripts.js"/>
+        <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true" />
+    </h:head>
+
+    <h:body>
+        <p:growl id="mensagem" />
+
+        <div id="geral">
+            <div id="topo" class="divTopo">
+                <form name="logado"  style="font-size:16px; font-family: sans-serif">
+                    Usuário: #{autenticacaoBean.usuarioLogado.nome} 
+                </form>
+                <p:graphicImage library="images" name="banner.png" styleClass="imagemCentralizada"/>
+            </div>
+
+            <div id="cabecalho" class="divCabecalho">
+
+                <h:form id="formMenu" class="form">
+                    <p:menubar>
+                        <p:menuitem icon="fa fa-home"  value="Página Inicial" url="/pages/principal.xhtml" />
+                        <p:submenu label="Cadastros" icon="fa fa-database">
+                            <p:menuitem icon="fa fa-list-ul" value="Categoria" url="/pages/categoria.xhtml"/>
+                            <p:menuitem icon="fa fa-users" value="Cliente" url="/pages/cliente.xhtml"/>
+                            <p:menuitem icon="fa fa-money" value="Formas de Pagamento" url="/pages/formaPagamento.xhtml"/>
+                            <p:menuitem icon="fa fa-truck" value="Fornecedor" url="/pages/fornecedor.xhtml"/>
+                            <p:menuitem icon="fa fa-tags" value="Marca" url="/pages/marca.xhtml"/>
+                            <p:menuitem icon="fa fa-briefcase" value="Produto" url="/pages/produto.xhtml"/>                          
+                            <p:menuitem icon="fa fa-user" value="Usuario" url="/pages/usuario.xhtml"/>
+                        </p:submenu>
+
+                        <p:submenu label="Movimentações" icon="fa fa-arrows-v">
+                            <p:menuitem icon="fa fa-shopping-cart" value="Fazer Vendas" url="/pages/venda.xhtml" />
+                            <p:menuitem icon="fa fa-print" value="Relatório Vendas" url="/pages/vendaListagem.xhtml"/>
+                            <p:menuitem icon="fa fa-reorder" value="Pedido - Revista" url="/pages/pedido.xhtml"/>
+                            <p:menuitem icon="fa fa-briefcase" value="Prod. Pedido-Revista" url="/pages/produtoPedito.xhtml"/>
+                        </p:submenu>
+
+                        <p:submenu label="Mapa" icon="fa fa-map-marker" >
+                            <p:menuitem icon="fa fa-map-marker" value="Marcador - Cliente" url="/pages/local.xhtml" />
+                        </p:submenu>
+
+                        <p:menuitem icon="fa fa-sign-out" value="Sair" action="#{autenticacaoBean.sair}" />
+                    </p:menubar>
+                </h:form>
+            </div>
+            <div id="conteudo">
+                <ui:insert name="conteudo" />
+            </div>
+        </div>
+    </h:body>
+</html>

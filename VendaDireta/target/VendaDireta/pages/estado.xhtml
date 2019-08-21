@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/templates/modelo.xhtml">
+
+    <ui:define name="conteudo">
+        <h:form id="formListagem">
+            <p:panel header="Lista de Estados">
+                <p:dataTable id="tabela" 
+                             emptyMessage="Nenhum registro encontrado."
+                             paginator="true" 
+                             value="#{estadoBean.estados}" 
+                             var="estado" 
+                             rows="5" paginatorPosition="top">
+                    
+                    <f:facet name="header">
+                        <p:commandButton value="Novo" 
+                                         oncomplete="PF('dialogo').show();" 
+                                         actionListener="#{estadoBean.novo}" 
+                                         update=":formCadastro:painel">
+                            <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+                        </p:commandButton>
+
+                    </f:facet>
+
+                    <p:column headerText="Nome" 
+                              sortBy="#{estado.nome}" 
+                              filterBy="#{estado.nome}">
+                        <h:outputText value="#{estado.nome}"/>
+                    </p:column>
+
+                    <p:column headerText="Sigla" 
+                              sortBy="#{estado.sigla}" 
+                              filterBy="#{estado.sigla}">
+                        <h:outputText value="#{estado.sigla}"/>
+                    </p:column>
+
+                    <p:column headerText="Opções">
+                        <p:commandButton icon="ui-icon-trash" 
+                                         actionListener="#{estadoBean.excluir}" 
+                                         update=":mensagem :formListagem:tabela">
+                            <p:confirm rendered="Confirmação" 
+                                       message="Deseja excluir o Estado?" 
+                                       icon="ui-icon-alert"/>
+                            <f:attribute name="estadoSelecionado" value="#{estado}"/>
+                        </p:commandButton>
+
+                        <p:commandButton icon="ui-icon-pencil" 
+                                         actionListener="#{estadoBean.editar}" 
+                                         update=":formCadastro:painel" 
+                                         oncomplete="PF('dialogo').show();">
+                            <f:attribute name="estadoSelecionado" value="#{estado}"/>
+                            <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+                        </p:commandButton>
+
+                    </p:column>
+                </p:dataTable>
+
+                <p:confirmDialog global="true">
+                    <center>
+                        <p:commandButton value="Sim" 
+                                         type="butoon" 
+                                         styleClass="ui-confirmdialog-yes" 
+                                         icon="ui-icon-check"/>
+                        <p:commandButton value="Não" 
+                                         type="butoon" 
+                                         styleClass="ui-confirmdialog-no" 
+                                         icon="ui-icon-close"/>
+                    </center>
+                </p:confirmDialog>
+            </p:panel>
+        </h:form>
+
+        <p:dialog header="Estados - Cadastro" 
+                  widgetVar="dialogo"
+                  resizable="false" 
+                  modal="true" 
+                  closable="false">
+            <h:form id="formCadastro">
+                <h:panelGrid id="painel" columns="2">
+                    <p:outputLabel for="nome" value="Nome:" />
+                    <p:inputText id="nome" 
+                                 maxlength="50" size="30"  
+                                 value="#{estadoBean.estado.nome}" 
+                                 required="true" requiredMessage="O campo 'Nome' é obrigatório"/>
+
+                    <p:outputLabel for="sigla" 
+                                   value="Sigla:" />
+                    <p:inputText id="sigla" maxlength="2" size="4"  value="#{estadoBean.estado.sigla}" required="true" requiredMessage="O campo 'Sigla' é obrigatório"/>
+                </h:panelGrid>
+
+                <p:outputPanel style=" text-align:center">
+                    <p:commandButton value="Salvar" actionListener="#{estadoBean.salvar}" update=":mensagem :formCadastro:painel :formListagem:tabela" />
+                    <p:commandButton value="Fechar" oncomplete="PF('dialogo').hide();" />
+                </p:outputPanel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+</ui:composition>

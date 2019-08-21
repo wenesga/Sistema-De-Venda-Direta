@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/templates/modelo.xhtml">
+
+    <ui:define name="conteudo">
+        <h:form id="formListagem">
+            <p:panel header="Lista de Produtos">
+                <p:dataTable id="tabela" 
+                             emptyMessage="Nenhum registro encontrado." 
+                             paginator="true"
+                             value="#{produtoBean.produtos}"
+                             var="produto" 
+                             rows="7" paginatorPosition="top">
+
+                    <f:facet name="header">
+                        <p:commandButton icon="fa fa-plus" value="Novo" 
+                                         actionListener="#{produtoBean.novo}"
+                                         oncomplete="PF('dialogo').show();"
+                                         update=":mensagem :formCadastro:painel">
+                            <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener"/>
+                        </p:commandButton>  
+
+                        <p:commandButton icon="fa fa-print" onclick="this.form.target = '_blank'" value="Imprimir"
+                                         actionListener="#{produtoBean.imprimir}"
+                                         update=":mensagem :formListagem:tabela"
+                                         ajax="false"/>
+                    </f:facet>
+
+                    <p:column headerText="Nome" filterMatchMode="contains"
+                              filterBy="#{produto.nome}"
+                              sortBy="#{produto.nome}">
+                        <h:outputText value="#{produto.nome}"/>
+                    </p:column>            
+
+                    <p:column headerText="Fornecedor" style="width: 15%;" filterMatchMode="contains"
+                              filterBy="#{produto.fornecedor.nome}"
+                              sortBy="#{produto.fornecedor.nome}">
+                        <h:outputText value="#{produto.fornecedor.nome}"/>
+                    </p:column>
+
+                    <p:column headerText="Marca" style="width: 15%;"
+                              filterBy="#{produto.marca.nome}"
+                              sortBy="#{produto.marca.nome}">
+                        <h:outputText value="#{produto.marca.nome}"/>
+                    </p:column>
+
+                    <p:column headerText="Categoria" style="width: 15%;"
+                              filterBy="#{produto.categoria.nome}"
+                              sortBy="#{produto.categoria.nome}">
+                        <h:outputText value="#{produto.categoria.nome}"/>
+                    </p:column>
+
+                    <p:column headerText="Valor Compra" style="width: 5%;"
+                              sortBy="#{produto.valor_compra}">
+                        <h:outputText value="#{produto.valor_compra}">
+                            <f:convertNumber locale="pt_BR" minFractionDigits="2"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Valor Venda" style="width: 5%;"
+                              sortBy="#{produto.valor_venda}">
+                        <h:outputText value="#{produto.valor_venda}">
+                            <f:convertNumber locale="pt_BR" minFractionDigits="2"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Estoque" style="width: 5%;"
+                              sortBy="#{produto.estoque}">
+                        <h:outputText value="#{produto.estoque}"/>
+                    </p:column>
+
+                    <p:column headerText="Estoque Minimo" style="width: 5%;"
+                              sortBy="#{produto.estoque_minimo}">
+                        <h:outputText value="#{produto.estoque_minimo}"/>
+                    </p:column>
+
+                    <p:column headerText="Opções" class="opcoes" style="width: 8%;">
+                        <p:commandButton icon="fa fa-trash" 
+                                         actionListener="#{produtoBean.excluir}" 
+                                         update=":mensagem :formListagem:tabela">
+                            <p:confirm rendered="Confirmação" message="Deseja excluir o Produto?" 
+                                       icon="fa fa-warning"/>
+                            <f:attribute name="produtoSelecionado" value="#{produto}"/>
+                        </p:commandButton>
+
+                        <p:commandButton icon="fa fa-edit" 
+                                         actionListener="#{produtoBean.editar}" 
+                                         update=":mensagem :formCadastro:painel" 
+                                         oncomplete="PF('dialogo').show();">
+                            <f:attribute name="produtoSelecionado" value="#{produto}"/>
+                            <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+                <p:confirmDialog global="true">
+                    <center>
+                        <p:commandButton value="Sim" type="butoon" styleClass="ui-confirmdialog-yes" 
+                                         icon="fa fa-check"/>
+                        <p:commandButton value="Não" type="butoon" styleClass="ui-confirmdialog-no" 
+                                         icon="fa fa-close"/>
+                    </center>
+                </p:confirmDialog>
+            </p:panel>
+        </h:form>
+
+        <p:dialog header="Produto - Cadastro" 
+                  widgetVar="dialogo"                  
+                  resizable="false" 
+                  modal="true" 
+                  closable="false">
+            <h:form id="formCadastro">
+                <h:panelGrid id="painel" columns="2">
+                    <p:outputLabel for="nome" value="Nome:" />
+                    <p:inputText id="nome" maxlength="100" size="34" 
+                                 value="#{produtoBean.produto.nome}"
+                                 required="true" 
+                                 requiredMessage="O campo 'Nome' é obrigatório"/>
+
+
+                    <p:outputLabel for="fornecedor" value="Fornecedor:" />
+                    <p:selectOneMenu id="fornecedor" filter="true" style="width:314px"
+                                     value="#{produtoBean.produto.fornecedor}" 
+                                     converter="omnifaces.SelectItemsConverter" 
+                                     required="true" 
+                                     requiredMessage="O campo 'Fornecedor' é obrigatório">
+                        <f:selectItem noSelectionOption="true" 
+                                      itemLabel="Selecione uma fornecedor" />
+                        <f:selectItems value="#{produtoBean.fornecedores}" 
+                                       var="fornecedor" 
+                                       itemValue="#{fornecedor}" 
+                                       itemLabel="#{fornecedor.nome} - #{fornecedor.tipo}"/>
+                    </p:selectOneMenu>
+
+
+                    <p:outputLabel for="categoria" value="Categoria:" />
+                    <p:selectOneMenu id="categoria" filter="true" style="width:314px"
+                                     value="#{produtoBean.produto.categoria}" 
+                                     converter="omnifaces.SelectItemsConverter" 
+                                     required="true" 
+                                     requiredMessage="O campo 'Categoria' é obrigatório">
+                        <f:selectItem noSelectionOption="true" 
+                                      itemLabel="Selecione uma categoria" />
+                        <f:selectItems value="#{produtoBean.categorias}" 
+                                       var="categoria" 
+                                       itemValue="#{categoria}" 
+                                       itemLabel="#{categoria.nome}"/>
+                    </p:selectOneMenu>
+
+
+                    <p:outputLabel for="marca" value="Marca:" />
+                    <p:selectOneMenu id="marca" filter="true" style="width:314px"
+                                     value="#{produtoBean.produto.marca}" 
+                                     converter="omnifaces.SelectItemsConverter" 
+                                     required="true" 
+                                     requiredMessage="O campo 'Marca' é obrigatório">
+                        <f:selectItem noSelectionOption="true" 
+                                      itemLabel="Selecione uma marca" />
+                        <f:selectItems value="#{produtoBean.marcas}" 
+                                       var="marca" 
+                                       itemValue="#{marca}" 
+                                       itemLabel="#{marca.nome}"/>
+                    </p:selectOneMenu>
+
+
+                    <p:outputLabel for="valorCompra" value="Valor de Compra:" />
+                    <p:inputText id="valorCompra" maxlength="7" size="10" 
+                                 value="#{produtoBean.produto.valor_compra}"                               
+                                 required="true" 
+                                 requiredMessage="O campo 'Valor de Compra' é obrigatório"
+                                 converterMessage="O valor informado no campo 'Valor de Compra' é  inválido"
+                                 validatorMessage="Informe um valor entre 0,01 e 9999,99 no campo 'Valor de Compra'">
+                        <f:validateDoubleRange minimum="0.01" maximum="9999.99"/>            
+                        <f:convertNumber locale="pt_BR" minFractionDigits="2"/>
+                    </p:inputText>
+
+
+                    <p:outputLabel for="valorVenda" value="Valor de Venda:" />
+                    <p:inputText id="valorVenda" maxlength="7" size="10" 
+                                 value="#{produtoBean.produto.valor_venda}" 
+                                 required="true" 
+                                 requiredMessage="O campo 'Valor de Venda' é obrigatório"
+                                 converterMessage="O valor informado no campo 'Valor de Venda' é  inválido"
+                                 validatorMessage="Informe um valor entre 0,01 e 9999,99 no campo 'Valor de Venda'">
+                        <f:validateDoubleRange minimum="0.01" maximum="9999.99"/>
+                        <f:convertNumber locale="pt_BR" minFractionDigits="2"/>
+                    </p:inputText>
+
+
+                    <p:outputLabel for="estoque" value="Estoque:" />
+                    <p:inputText id="estoque" maxlength="6" size="10" 
+                                 value="#{produtoBean.produto.estoque}" 
+                                 required="true" 
+                                 requiredMessage="O campo 'Estoque' é obrigatório"
+                                 converterMessage="O valor informado no campo 'Estoque' é  inválido"
+                                 validatorMessage="Informe um valor entre 0 e 500 no campo 'Estoque'">
+                        <f:validateLongRange minimum="0" maximum="500"/>
+                    </p:inputText>
+
+
+                    <p:outputLabel for="estoqueMinimo" value="Estoque Mínimo:" />
+                    <p:inputText id="estoqueMinimo" maxlength="6" size="10" 
+                                 value="#{produtoBean.produto.estoque_minimo}" 
+                                 required="true" 
+                                 requiredMessage="O campo 'Estoque Minimo' é obrigatório"
+                                 converterMessage="O valor informado no campo 'Estoque Mínimo' é  inválido"
+                                 validatorMessage="Informe um valor entre 0 e 500 no campo 'Estoque Mínimo'">
+                        <f:validateLongRange minimum="0" maximum="500"/>
+                    </p:inputText>
+
+
+                </h:panelGrid>
+                <p:outputPanel style="text-align:center">
+                    <p:commandButton icon="fa fa-floppy-o" value="Salvar" actionListener="#{produtoBean.salvar}" 
+                                     update=":mensagem :formCadastro:painel :formListagem:tabela" />
+                    <p:commandButton icon="fa fa-close" value="Fechar" oncomplete="PF('dialogo').hide();" />
+                </p:outputPanel>          
+            </h:form>
+        </p:dialog>
+    </ui:define>
+</ui:composition>

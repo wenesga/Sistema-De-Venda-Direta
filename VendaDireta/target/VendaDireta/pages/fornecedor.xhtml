@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/templates/modelo.xhtml">
+
+    <ui:define name="conteudo">
+        <h:form id="formListagem">
+            <p:panel header="Lista de Fornecedores">
+                <p:dataTable id="tabela" 
+                             emptyMessage="Nenhum registro encontrado."
+                             paginator="true"
+                             value="#{fornecedorBean.fornecedores}"
+                             var="fornecedor" 
+                             rows="7" paginatorPosition="top">
+
+                    <f:facet name="header">
+                        <p:commandButton icon="fa fa-plus" value="Novo" 
+                                         actionListener="#{fornecedorBean.novo}"
+                                         oncomplete="PF('dialogo').show();"
+                                         update=":mensagem :formCadastro:painel">
+                            <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+                        </p:commandButton>
+                    </f:facet>
+
+                    <p:column headerText="Nome" filterMatchMode="contains"
+                              filterBy="#{fornecedor.nome}"
+                              sortBy="#{fornecedor.nome}">
+                        <h:outputText value="#{fornecedor.nome}" />
+                    </p:column>
+
+                    <p:column headerText="Tipo" style="width: 12%;"
+                              filterBy="#{fornecedor.tipo}"
+                              sortBy="#{fornecedor.tipo}">
+                        <h:outputText value="#{fornecedor.tipo}"/>
+                    </p:column>
+
+                    <p:column headerText="Telefone" style="width: 12%;"
+                              filterBy="#{fornecedor.telefone}"
+                              sortBy="#{fornecedor.telefone}">
+                        <h:outputText value="#{fornecedor.telefone}"/>
+                    </p:column>
+
+                    <p:column headerText="Cidade" style="width: 15%;"
+                              filterBy="#{fornecedor.cidade.nome}"
+                              sortBy="#{fornecedor.cidade.nome}">
+                        <h:outputText value="#{fornecedor.cidade.nome}"/>
+                        <h:outputText value=" - "/>
+                        <h:outputText value="#{fornecedor.cidade.estado.sigla}"/>
+                    </p:column>
+
+                    <p:column headerText="Endereço" filterMatchMode="contains"
+                              filterBy="#{fornecedor.endereco}"
+                              sortBy="#{fornecedor.endereco}">
+                        <h:outputText value="#{fornecedor.endereco}"/>
+                    </p:column>
+
+                    <p:column headerText="Opções" class="opcoes" style="width: 8%;">
+                        <p:commandButton icon="fa fa-trash" 
+                                         actionListener="#{fornecedorBean.excluir}" 
+                                         update=":mensagem :formListagem:tabela">
+                            <p:confirm rendered="Confirmação" message="Deseja excluir o Fornecedor?" 
+                                       icon="fa fa-warning"/>
+                            <f:attribute name="fornecedorSelecionado" value="#{fornecedor}"/>
+                        </p:commandButton>
+
+                        <p:commandButton icon="fa fa-edit" 
+                                         actionListener="#{fornecedorBean.editar}" 
+                                         update=":mensagem :formCadastro:painel" 
+                                         oncomplete="PF('dialogo').show();">
+                            <f:attribute name="fornecedorSelecionado" value="#{fornecedor}"/>
+                            <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+
+                <p:confirmDialog global="true">
+                    <center>
+                        <p:commandButton value="Sim" type="butoon" styleClass="ui-confirmdialog-yes" 
+                                         icon="fa fa-check"/>
+                        <p:commandButton value="Não" type="butoon" styleClass="ui-confirmdialog-no" 
+                                         icon="fa fa-close"/>
+                    </center>
+                </p:confirmDialog>            
+            </p:panel>
+        </h:form>
+
+
+        <p:dialog header="Fornecedor - Cadastro" 
+                  widgetVar="dialogo"
+                  resizable="false" 
+                  modal="true" 
+                  closable="false">
+
+            <h:form id="formCadastro">
+                <h:panelGrid id="painel" columns="2">
+
+                    <p:outputLabel for="nome" value="Nome:" />
+                    <p:inputText id="nome" maxlength="100" size="30" 
+                                 value="#{fornecedorBean.fornecedor.nome}"
+                                 required="true" 
+                                 requiredMessage="O campo 'Nome' é obrigatório"/>
+
+                    <p:outputLabel for="endereco" value="Endereço:" />
+                    <p:inputText id="endereco" maxlength="100" size="30" 
+                                 value="#{fornecedorBean.fornecedor.endereco}"
+                                 required="true" 
+                                 requiredMessage="O campo 'Endereço' é obrigatório"/>
+
+                    <p:outputLabel for="telefone" value="Telefone:" />
+                    <p:inputMask mask="(99)99999-9999" id="telefone"  size="11" 
+                                 value="#{fornecedorBean.fornecedor.telefone}"
+                                 required="true" 
+                                 requiredMessage="O campo 'Telefone' é obrigatório"/>
+
+                    <p:outputLabel for="estado" value="Estado:" />
+                    <p:selectOneMenu id="estado" filter="true" style="width:210px"
+                                     converter="omnifaces.SelectItemsConverter" 
+                                     value="#{fornecedorBean.estado}">
+                        <f:selectItem noSelectionOption="true" itemLabel="Selecione um estado" />
+                        <f:selectItems value="#{fornecedorBean.estados}" var="estado"
+                                       itemValue="#{estado}" itemLabel="#{estado.nome}"/>
+                        <p:ajax listener="#{fornecedorBean.popular}" update=":formCadastro:cidade"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel for="cidade" value="Cidade:" />
+                    <p:selectOneMenu id="cidade" filter="true" style="width:210px"
+                                     converter="omnifaces.SelectItemsConverter" 
+                                     required="true"
+                                     requiredMessage="O campo 'Cidade' é obrigatório"
+                                     value="#{fornecedorBean.fornecedor.cidade}">
+                        <f:selectItem noSelectionOption="true" itemLabel="Selecione uma cidade" />
+                        <f:selectItems value="#{fornecedorBean.cidades}" var="cidade"
+                                       itemValue="#{cidade}" itemLabel="#{cidade.nome}" />
+                    </p:selectOneMenu>
+
+                    <p:outputLabel for="tipo" value="Tipo:" />
+                    <p:selectOneRadio id="tipo" value="#{fornecedorBean.fornecedor.tipo}"
+                                      required="true" 
+                                      requiredMessage="O campo 'Tipo' é obrigatório">
+                        <f:selectItem itemValue="Venda Direta" itemLabel="Venda Direta"/>
+                        <f:selectItem itemValue="Venda Tradicional" itemLabel="Venda Tradicional"/>
+                    </p:selectOneRadio>                 
+                </h:panelGrid>
+
+
+                <p:outputPanel style="text-align:center">
+                    <p:commandButton icon="fa fa-floppy-o" value="Salvar" actionListener="#{fornecedorBean.salvar}" 
+                                     update=":mensagem :formCadastro:painel :formListagem:tabela"/>
+                    <p:commandButton icon="fa fa-close" value="Fechar" oncomplete="PF('dialogo').hide();" />
+                </p:outputPanel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+</ui:composition>
