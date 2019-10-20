@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: br.com.vendadireta.dao.CidadeDAOTest
 -------------------------------------------------------------------------------
-Tests run: 7, Failures: 0, Errors: 0, Skipped: 7, Time elapsed: 0.057 sec
+Tests run: 7, Failures: 0, Errors: 0, Skipped: 7, Time elapsed: 0.054 sec
